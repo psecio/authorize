@@ -1,0 +1,23 @@
+{
+    "name": "psecio/authorize",
+    "description": "A comprehensive authorization library",
+    "keywords": ["authorization", "rbac", "acl", "pbac"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Chris Cornutt",
+            "email": "ccornutt@phpdeveloper.org"
+        }
+    ],
+    "require": {
+        "psecio/propauth": "^1.0",
+        "enygma/xacmlphp": "^1.1"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Psecio\\Authorize\\": "src/"
+        }
+    }
+}

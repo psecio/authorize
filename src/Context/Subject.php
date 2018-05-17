@@ -24,6 +24,11 @@ class Subject implements \Psecio\Authorize\Context\SubjectInterface
         }
     }
 
+    public function setData($key, $value)
+    {
+        $this->data[$key] = $value;
+    }
+
     public function getIdentifier() : string
     {
         return $this->getData('identifier');
@@ -39,5 +44,10 @@ class Subject implements \Psecio\Authorize\Context\SubjectInterface
     {
         $groups = $this->getData('groups');
         return (is_array($groups)) ? $groups : [];
+    }
+
+    public function setIdentifier($identifier) : bool
+    {
+        $this->setData('identifier', $identifier);
     }
 }

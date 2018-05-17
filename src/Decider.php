@@ -19,5 +19,5 @@ abstract class Decider
         }
     }
 
-    public abstract function execute($input);
+    public abstract function execute($policy, $input);
 }

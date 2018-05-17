@@ -4,34 +4,55 @@ namespace Psecio\Authorize;
 
 class Enforcer
 {
-    protected $deciderSet = [];
+    protected $policies = [];
 
-    public function __construct($decider)
+    public function __construct($policy)
     {
-        $this->setDecider($decider);
+        $this->setPolicy($policy);
     }
 
-    public function setDecider($decider)
+    public function setPolicy($policy)
     {
-        if (!is_array($decider)) {
-            $decider = [$decider];
+        if (!is_array($policy)) {
+            $policy = [$policy];
         }
-        $this->deciderSet = $decider;
+        $this->policies = $policy;
     }
 
-    // public function verify(\Psecio\Authorize\Context $context)
+    public function getPolicies()
+    {
+        return $this->policies;
+    }
+
     public function verify(...$input)
     {
-        $deciders = $this->deciderSet;
+        $policies = $this->policies;
+        $pass = true;
 
-        // A decider combines the policy instance with the input to see if there's a match
+        // This is ALL must pass - how to allow them to say ANY?
 
-        foreach ($deciders as $decider) {
+        $enforcer = new \Psecio\PropAuth\Enforcer();
+        foreach ($policies as $policy) {
+            print_r($policy);
             
-            echo get_class($decider)."\n";
+            if (!($input[0] instanceof \Psecio\Authorize\Context\SubjectInterface)) {
+                $subject = new \Psecio\Authorize\Context\Subject([
+                    'identifier' => $input[0]
+                ]);
+            } else {
+                $subject = $input[0];
+            }
 
-            $result = $decider->execute($policy);
-            var_export($result);
+            // $policy = $this->buildPolicy($decider, $input);
+            echo 'PRE'."\n";
+            $result = $enforcer->evaluate($subject, $policy);
+            echo 'RES: '.var_export($result, true)."\n";
+
+            if ($enforcer->evaluate($subject, $policy) == false) {
+                $pass = false;
+            }
         }
+
+        return $pass;
     }
 }

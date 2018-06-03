@@ -6,7 +6,7 @@ use \Psecio\PropAuth\Policy;
 
 class Permission extends \Psecio\PropAuth\Policy
 {
-    public function __construct($input)
+    public function __construct($input, $matchType)
     {
         echo 'perm policy'."\n";
 

@@ -5,10 +5,21 @@ namespace Psecio\Authorize;
 class Enforcer
 {
     protected $policies = [];
+    protected $matchType;
 
-    public function __construct($policy)
+    const MATCH_ANY = 'any';
+    const MATCH_ALL = 'all';
+    const MATCH_NONE = 'none';
+
+    public function __construct($policy, $matchType = null)
     {
         $this->setPolicy($policy);
+
+        // Default to "match all"
+        if ($matchType == null) {
+            $matchType = self::MATCH_ALL;
+        }
+        $this->setMatchType($matchType);
     }
 
     public function setPolicy($policy)
@@ -17,6 +28,16 @@ class Enforcer
             $policy = [$policy];
         }
         $this->policies = $policy;
+    }
+
+    public function setMatchType($matchType)
+    {
+        $this->matchType = $matchType;
+    }
+
+    public function getMatchType()
+    {
+        return $this->matchType;
     }
 
     public function getPolicies()
@@ -28,13 +49,10 @@ class Enforcer
     {
         $policies = $this->policies;
         $pass = true;
-
-        // This is ALL must pass - how to allow them to say ANY?
+        $pass = [];
 
         $enforcer = new \Psecio\PropAuth\Enforcer();
         foreach ($policies as $policy) {
-            print_r($policy);
-            
             if (!($input[0] instanceof \Psecio\Authorize\Context\SubjectInterface)) {
                 $subject = new \Psecio\Authorize\Context\Subject([
                     'identifier' => $input[0]
@@ -43,16 +61,22 @@ class Enforcer
                 $subject = $input[0];
             }
 
-            // $policy = $this->buildPolicy($decider, $input);
-            echo 'PRE'."\n";
-            $result = $enforcer->evaluate($subject, $policy);
-            echo 'RES: '.var_export($result, true)."\n";
-
-            if ($enforcer->evaluate($subject, $policy) == false) {
-                $pass = false;
-            }
+            $pass[] = $enforcer->evaluate($subject, $policy);
         }
 
-        return $pass;
+        // Vet results against the match type (all vs any)
+        switch($this->getMatchType())
+        {
+            case self::MATCH_ALL:
+                // If there are any false, this fails
+                return (array_search(false, $pass) !== false) ? false : true;
+
+            case self::MATCH_ANY:
+                // If there are any true, this passes
+                return (array_search(true, $pass) !== false) ? true : false;
+
+            default:
+                return false;
+        }
     }
 }

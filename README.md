@@ -84,3 +84,70 @@ $user = new User();
 $result = Auth::build('permission', ['perm1'])->verify($user); // Returns true
 ?>
 ```
+
+### Role-based
+
+```php
+<?php
+
+class MyGroup implements \Psecio\Authorize\Context\SubjectInterface
+{
+    protected $name = '';
+    protected $permissions = [];
+
+    public function getName()
+    {
+
+    }
+    public function getPermissions()
+    {
+        // Fetch the permissions related to the group and return an array 
+        // Name sure they implement the PermissionInterface so getName will exist
+
+        $names = [];
+        foreach ($permissions as $permission) {
+            $names = $permission->getName();
+        }
+        return $names;
+    }
+}
+
+class User implements \Psecio\Authorize\Context\SubjectInterface
+{
+    public function getIdentifier() : string
+    {
+        return 'user1';
+    }
+
+    public function getGroups() : array
+    {
+        // Fetch the groups as instances of the "MyGroup" class
+        // in this case, they're in the $groups array
+
+        $names = [];
+        foreach ($groups as $group) {
+            $names[] = $group->getName();
+        }
+    }
+
+    public function getPermissions() : array
+    {
+        return ['perm1'];
+    }
+
+    public function setIdentifier($identifier) : bool
+    {
+        return true;
+    }
+}
+
+$user = new User();
+
+// You can pass in either a group name or permission name here
+// It will search groups first then permissions inside of those groups
+
+$result = Auth::build('rbac', ['group1'])->verify($user); // Returns true
+
+$result = Auth::build('rbac', ['perm1'])->verify($user); // Returns true
+?>
+```

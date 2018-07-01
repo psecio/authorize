@@ -26,6 +26,9 @@ class Auth
                 ];
                 $match = Enforcer::MATCH_ANY;
                 break;
+            case 'pbac':
+                $policy = $input[0];
+                break;
             default:
                 throw new \InvalidArgumentException('Unknown type: '.$type);
         }

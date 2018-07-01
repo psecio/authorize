@@ -151,3 +151,17 @@ $result = Auth::build('rbac', ['group1'])->verify($user); // Returns true
 $result = Auth::build('rbac', ['perm1'])->verify($user); // Returns true
 ?>
 ```
+
+### Property-based
+
+The property based evaluation for the `Authorize` library makes use of the [psecio/propauth library](https://github.com/psecio/propauth) for policy-based evaluation using the same interface as the other methods.
+
+For example, to check and see if a user has a `username` property you could use the following:
+
+```php
+<?php
+$policy = \Psecio\PropAuth\Policy::instance()->hasUsername('ccornutt');
+$result = Auth::build('pbac', $policy)->verify($user); // Returns true
+
+?>
+```

@@ -160,8 +160,10 @@ For example, to check and see if a user has a `username` property you could use 
 
 ```php
 <?php
+$user = new User();
+$user->username = 'ccornutt';
+
 $policy = \Psecio\PropAuth\Policy::instance()->hasUsername('ccornutt');
 $result = Auth::build('pbac', $policy)->verify($user); // Returns true
-
 ?>
 ```
